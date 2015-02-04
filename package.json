@@ -1,0 +1,47 @@
+{
+  "name": "package-cleanup",
+  "version": "0.1.2",
+  "description": "Package cleanup before deploy - delete or move all unnecessary files by gitignore-like patterns",
+  "bin": {
+    "package-cleanup": "./bin/package-cleanup"
+  },
+  "scripts": {
+    "test": "mocha",
+    "watch": "mocha --watch"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "author": {
+    "name": "Alexey Kalmakov",
+    "email": "alex-k@yandex-team.ru",
+    "url": "https://github.com/rndD"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/rndD/package-cleanup.git"
+  },
+  "homepage": "https://github.com/rndD/package-cleanup",
+  "bugs": "https://github.com/rndD/package-cleanup/issues",
+  "dependencies": {
+    "globby": "^1.1.0",
+    "coa": "^0.4.1",
+    "lodash": "^2.4.1",
+    "q": "^1.1.2",
+    "q-io": "^1.11.6"
+  },
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "mocha": "^1.18.2",
+    "sinon": "^1.10.3"
+  },
+  "keywords": [
+    "cleanup",
+    "gitignore",
+    "package",
+    "glob",
+    "patterns",
+    "remove",
+    "delete"
+  ]
+}
