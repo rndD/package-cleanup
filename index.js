@@ -1,26 +1,27 @@
 var path = require('path');
 var fs = require('fs');
-var format = require('util').format;
 
 var _ = require('lodash');
+
 var Q = require('q');
 var FSQ = require("q-io/fs");
 
 var globby = require('./lib/globby-as-promise');
 
-var logStackTrace = function(e) { console.error(e.stack) };
 
+var logStackTrace = function(e) { console.error(e.stack) };
 // By default files with leading dot are not matches to '*'
 const DEFAULT_GLOBBY_OPTIONS = { dot: true };
 
 /**
  * @param {String} patternsFilename - Path to file with patterns
  * @param {Object} [globbyOptions] - Options for globby search
+ * @param {Boolean} [dryRun]
  * @see https://github.com/isaacs/node-glob#options
  */
 var PackageCleaner = function (patternsFilename, globbyOptions, dryRun) {
     console.assert(patternsFilename, 'Path to file with patterns not defined');
-    console.assert(fs.existsSync(patternsFilename), 'File with patterns not exists');
+    console.assert(fs.existsSync(patternsFilename), 'File with patterns "' + patternsFilename + '" does not exist');
 
     this.globbyOptions = _.defaults({}, globbyOptions, DEFAULT_GLOBBY_OPTIONS);
 
@@ -60,7 +61,7 @@ PackageCleaner.prototype.move = function(outPath) {
 };
 
 PackageCleaner.prototype.readPatterns = function() {
-     return FSQ.read(this.patternsFilename);
+    return FSQ.read(this.patternsFilename);
 };
 
 /**
@@ -82,6 +83,9 @@ PackageCleaner.prototype.getFilesToKeep = function(patterns) {
     return globby(patterns, this.globbyOptions);
 };
 
+/**
+ * @param {String[]} filesToKeep
+ */
 PackageCleaner.prototype.setFilesToKeep = function(filesToKeep) {
     this.filesToKeep = _.map(filesToKeep, path.normalize);
     this.dirsToKeep = this.getDirsToKeep(this.filesToKeep);
@@ -113,6 +117,11 @@ PackageCleaner.prototype.getDirsToKeep = function(filesToKeep) {
         .value();
 };
 
+/**
+ * @param {String} outPath - output dir path
+ * @param {String[]} filesToKeep
+ * @returns {Q.Promise}
+ */
 PackageCleaner.prototype.copyFilesToKeep = function(outPath, filesToKeep) {
     var that = this;
 
@@ -171,6 +180,10 @@ PackageCleaner.prototype.addPathToDeleteList = function(path) {
     this.pathsToDelete.push(path);
 };
 
+/**
+ * Search empty files and add it to delete list
+ * @returns {Q.Promise}
+ */
 PackageCleaner.prototype.searchEmptyFiles = function() {
     var that = this;
 
