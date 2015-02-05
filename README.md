@@ -88,6 +88,7 @@ Options:
   -p PATTERNS, --patterns=PATTERNS : Path to file with patterns (required)
   -w WORKINGDIR, --working-dir=WORKINGDIR : Working directory
   -d, --dry-run : Dry run
+  --delete-empty : Delete empty files
 
 Options for move subcommand:
   -o OUTPUTDIR, --output-dir=OUTPUTDIR : Output dir
