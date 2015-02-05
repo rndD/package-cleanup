@@ -16,16 +16,17 @@ const DEFAULT_GLOBBY_OPTIONS = { dot: true };
 /**
  * @param {String} patternsFilename - Path to file with patterns
  * @param {Object} [globbyOptions] - Options for globby search
- * @param {Boolean} [dryRun]
+ * @param {Object} [options] - options from CLI
  * @see https://github.com/isaacs/node-glob#options
  */
-var PackageCleaner = function (patternsFilename, globbyOptions, dryRun) {
+var PackageCleaner = function (patternsFilename, globbyOptions, options) {
     console.assert(patternsFilename, 'Path to file with patterns not defined');
     console.assert(fs.existsSync(patternsFilename), 'File with patterns "' + patternsFilename + '" does not exist');
 
     this.globbyOptions = _.defaults({}, globbyOptions, DEFAULT_GLOBBY_OPTIONS);
+    this.options = _.defaults({}, options);
 
-    dryRun === true && this.setDryRunMethods();
+    this.options['dryRun'] === true && this.setDryRunMethods();
 
     this.patternsFilename = patternsFilename;
     this.filesToKeep = null;
@@ -44,7 +45,7 @@ PackageCleaner.prototype.clean = function() {
         .then(this.getFilesToKeep)
         .then(this.setFilesToKeep)
         .then(this.searchFilesToDelete)
-        .then(this.searchEmptyFiles)
+        .then(this.options['deleteEmpty'] ? this.searchEmptyFiles : _.noop)
         .then(this.deleteFiles)
         .catch(logStackTrace)
         .done();
