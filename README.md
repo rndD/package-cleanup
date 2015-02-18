@@ -1,5 +1,7 @@
 ###Package cleanup
 
+[![Build Status](https://travis-ci.org/rndD/package-cleanup.svg?branch=master)](https://travis-ci.org/rndD/package-cleanup)
+
 Command-line tool to delete or move all unnecessary files by gitignore-like patterns.
 
 ####Example
