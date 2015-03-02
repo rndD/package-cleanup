@@ -29,6 +29,7 @@ Delete all not python/ruby files in 'src':
 $ cat .scripts-patterns
 **/*.py
 **/*.rb
+# Don't keep tests for our scripts
 !**/test.{py,rb}
 
 $ tree ./src
