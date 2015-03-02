@@ -71,7 +71,8 @@ PackageCleaner.prototype.readPatterns = function() {
  */
 PackageCleaner.prototype.parsePatterns = function(content) {
     return _(content.split('\n'))
-            .invoke("trim")
+            .map(_.trim)
+            .filter(function(p) { return !_.startsWith(p, '#') })
             .compact()
             .value();
 };

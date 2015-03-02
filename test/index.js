@@ -70,6 +70,33 @@ describe('PackageCleaner', function () {
             ]);
         });
 
+        it('should trim', function () {
+            var patterns = [
+                '/a/**/d.jpg',
+                '',
+                '    /a/b/**.jpg'
+            ].join('\n');
+
+            expect(pc.parsePatterns(patterns)).to.be.eql([
+                '/a/**/d.jpg',
+                '/a/b/**.jpg'
+            ]);
+        });
+
+        it('should remove comments', function () {
+            var patterns = [
+                '# Some comment about glob',
+                '/a/**/d.jpg',
+                '   # Some cool indent  ',
+                '/a/b/**.jpg'
+            ].join('\n');
+
+            expect(pc.parsePatterns(patterns)).to.be.eql([
+                '/a/**/d.jpg',
+                '/a/b/**.jpg'
+            ]);
+        });
+
         it('should remove whitespaces from the beginning and end of pattern', function () {
             var patterns = [
                 '   !x.jpg',
