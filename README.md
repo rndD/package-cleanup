@@ -9,8 +9,10 @@ Command-line tool to delete or move all unnecessary files by gitignore-like patt
 Move all js/css/images from '.' to 'frontend' dir:
 ```
 $ cat .frontend-patterns
+# Keep scripts and styles
 **/*.js
 **/*.css
+# Keep images ends with .jpg .png .svg
 img/*.{jpg,png,svg}
 
 $ ./node_modules/.bin/package-cleanup move -p .frontend-patterns -o ./frontend
