@@ -51,8 +51,8 @@ PackageCleaner.prototype.clean = function() {
         .done();
 };
 
-PackageCleaner.prototype.move = function(outPath) {
-    return Q.when(this._makeDirMethod(outPath))
+PackageCleaner.prototype.copy = function(outPath) {
+    return Q.when(this._makeTreeMethod(outPath))
         .then(this.readPatterns)
         .then(this.parsePatterns)
         .then(this.getFilesToKeep)
@@ -217,7 +217,7 @@ PackageCleaner.prototype.setDryRunMethods = function() {
     this._deleteDirMethod = function(p) { console.log('rm -rf ' + p)};
     this._deleteFileMethod = function(p) { console.log('rm ' + p)};
     this._copyMethod = function(f, t) { console.log('cp ' + f + ' ' + t)};
-    this._makeDirMethod = this._makeTreeMethod = function(p) { console.log('mkdir ' + p)};
+    this._makeTreeMethod = function(p) { console.log('mkdir -p ' + p)};
     return this;
 };
 
@@ -230,8 +230,6 @@ PackageCleaner.prototype._deleteDirMethod = function(p) { return FSQ.removeTree(
 PackageCleaner.prototype._copyMethod = function(f, t) { return FSQ.copy(f,t) };
 
 PackageCleaner.prototype._makeTreeMethod = function(p) { return FSQ.makeTree(p) };
-
-PackageCleaner.prototype._makeDirMethod = function(p) { return FSQ.makeDirectory(p) };
 
 PackageCleaner.prototype._isItFileToKeep = function(file) {
     return _.contains(this.filesToKeep, file);
