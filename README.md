@@ -1,19 +1,19 @@
-###Package cleanup
+### Package cleanup
 
 [![Build Status](https://travis-ci.org/rndD/package-cleanup.svg?branch=master)](https://travis-ci.org/rndD/package-cleanup)
 
-Command-line tool to delete or move all unnecessary files by gitignore-like patterns.
+Command-line tool to delete or copy all unnecessary files by gitignore-like patterns.
 
-####Example
+#### Example
 
-Move all js/css/images from '.' to 'frontend' dir:
+Copy all js/css/images from '.' to 'frontend' dir:
 ```
 $ cat .frontend-patterns
 **/*.js
 **/*.css
 img/*.{jpg,png,svg}
 
-$ ./node_modules/.bin/package-cleanup move -p .frontend-patterns -o ./frontend
+$ ./node_modules/.bin/package-cleanup copy -p .frontend-patterns -o ./frontend
 $ ls ./frontend
 js/jquery/jq.min.js
 js/jquery/jq.simple-slider.js
@@ -29,7 +29,7 @@ Delete all not python/ruby files in 'src':
 $ cat .scripts-patterns
 **/*.py
 **/*.rb
-# Don't keep tests for our scripts
+# Don't keep tests
 !**/test.{py,rb}
 
 $ tree ./src
@@ -73,7 +73,7 @@ src
 4 directories, 6 files
 ```
 
-####Usage
+#### Usage
 
 ```
 Package cleanup
@@ -83,7 +83,7 @@ Usage:
 
 Commands:
   clean : Cleanup package - delete all files matching to the patters
-  move : Move all files matching to the patterns to dir
+  copy : Copy all files matching to the patterns to dir
 
 Options:
   -h, --help : Help
@@ -93,6 +93,6 @@ Options:
   -d, --dry-run : Dry run
   --delete-empty : Delete empty files
 
-Options for move subcommand:
+Options for copy subcommand:
   -o OUTPUTDIR, --output-dir=OUTPUTDIR : Output dir
 ```
