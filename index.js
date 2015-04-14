@@ -9,7 +9,10 @@ var FSQ = require("q-io/fs");
 var globby = require('./lib/globby-as-promise');
 
 
-var logStackTrace = function(e) { console.error(e.stack) };
+var logStackTraceAndExit = function(e) {
+    console.error(e.stack);
+    process.exit(1);
+};
 // By default files with leading dot are not matches to '*'
 const DEFAULT_GLOBBY_OPTIONS = { dot: true };
 
@@ -47,7 +50,7 @@ PackageCleaner.prototype.clean = function() {
         .then(this.searchFilesToDelete)
         .then(this.options['deleteEmpty'] ? this.searchEmptyFiles : _.noop)
         .then(this.deleteFiles)
-        .catch(logStackTrace)
+        .catch(logStackTraceAndExit)
         .done();
 };
 
@@ -57,7 +60,7 @@ PackageCleaner.prototype.copy = function(outPath) {
         .then(this.parsePatterns)
         .then(this.getFilesToKeep)
         .then(_.partial(this.copyFilesToKeep, outPath))
-        .catch(logStackTrace)
+        .catch(logStackTraceAndExit)
         .done();
 };
 
