@@ -230,7 +230,7 @@ PackageCleaner.prototype._deleteFileMethod = function(p) { return FSQ.remove(p) 
 
 PackageCleaner.prototype._deleteDirMethod = function(p) { return FSQ.removeTree(p) };
 
-PackageCleaner.prototype._copyMethod = function(f, t) { return FSQ.copy(f,t) };
+PackageCleaner.prototype._copyMethod = function(f, t) { return FSQ.copyTree(f,t) };
 
 PackageCleaner.prototype._makeTreeMethod = function(p) { return FSQ.makeTree(p) };
 
