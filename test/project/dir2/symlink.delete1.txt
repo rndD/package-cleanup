@@ -1,0 +1,1 @@
+../dir1/delete1.txt

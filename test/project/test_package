@@ -1,0 +1,4 @@
+test_package
+**/*.{txt,keep}
+!**/*delete*.txt
+
