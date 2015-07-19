@@ -8,7 +8,6 @@ var FSQ = require("q-io/fs");
 
 var globby = require('./lib/globby-as-promise');
 
-
 var logStackTraceAndExit = function(e) {
     console.error(e.stack);
     process.exit(1);
@@ -40,7 +39,7 @@ var PackageCleaner = function (patternsFilename, globbyOptions, options) {
 };
 
 /**
- * @returns {Q.Promise}
+ * Входная точка для команды clean из cli
  */
 PackageCleaner.prototype.clean = function() {
     return Q.when(this.readPatterns())
@@ -48,18 +47,22 @@ PackageCleaner.prototype.clean = function() {
         .then(this.getFilesToKeep)
         .then(this.setFilesToKeep)
         .then(this.searchFilesToDelete)
-        .then(this.options['deleteEmpty'] ? this.searchEmptyFiles : _.noop)
+        .then(this.options['deleteEmpty'] ? this.deleteEmptyFiles: _.identity)
         .then(this.deleteFiles)
         .catch(logStackTraceAndExit)
         .done();
 };
 
+/**
+ * Входная точка для команды copy из cli
+ */
 PackageCleaner.prototype.copy = function(outPath) {
     return Q.when(this._makeTreeMethod(outPath))
         .then(this.readPatterns)
         .then(this.parsePatterns)
         .then(this.getFilesToKeep)
-        .then(_.partial(this.copyFilesToKeep, outPath))
+        .then(this.options['notCopyEmpty'] ? this.filterEmptyFiles: _.identity)
+        .then(_.partial(this.copyFiles, outPath))
         .catch(logStackTraceAndExit)
         .done();
 };
@@ -75,6 +78,7 @@ PackageCleaner.prototype.readPatterns = function() {
 PackageCleaner.prototype.parsePatterns = function(content) {
     return _(content.split('\n'))
             .map(_.trim)
+            // Remove comments
             .filter(function(p) { return !_.startsWith(p, '#') })
             .compact()
             .value();
@@ -114,7 +118,7 @@ PackageCleaner.prototype.getDirsToKeep = function(filesToKeep) {
     }
 
     return _.chain(filesToKeep)
-        .map(path.dirname) // TODO can be dangerous, cuz 'pages/search' he will convert to 'pages/'
+        .map(path.dirname)
         .map(path.normalize)
         .reduce(parsePathToDirs, [])
         .uniq()
@@ -124,17 +128,17 @@ PackageCleaner.prototype.getDirsToKeep = function(filesToKeep) {
 
 /**
  * @param {String} outPath - output dir path
- * @param {String[]} filesToKeep
+ * @param {String[]} filesToCopy
  * @returns {Q.Promise}
  */
-PackageCleaner.prototype.copyFilesToKeep = function(outPath, filesToKeep) {
+PackageCleaner.prototype.copyFiles = function(outPath, filesToCopy) {
     var that = this;
 
     function newPath(p) {
         return path.join(outPath, p);
     }
 
-    var createDirsPromises = _.chain(filesToKeep)
+    var createDirsPromises = _.chain(filesToCopy)
         .map(path.dirname)
         .map(path.normalize)
         .uniq()
@@ -144,9 +148,20 @@ PackageCleaner.prototype.copyFilesToKeep = function(outPath, filesToKeep) {
 
     return Q.all(createDirsPromises)
         .then(function() {
-            var copyFilesPromises = filesToKeep.map(function(p) { return that._copyMethod(p, newPath(p)) });
+            var copyFilesPromises = filesToCopy.map(function(p) { return that._copyMethod(p, newPath(p)) });
             return Q.all(copyFilesPromises);
         });
+};
+
+/**
+ * @param {String[]} filesToFilter
+ * @returns {Q.Promise<String[]>}
+ */
+PackageCleaner.prototype.filterEmptyFiles = function(filesToFilter) {
+    return this.searchEmptyFiles(filesToFilter)
+        .then(function(emptyFiles) {
+            return _.difference(filesToFilter, emptyFiles);
+        })
 };
 
 /**
@@ -189,19 +204,32 @@ PackageCleaner.prototype.addPathToDeleteList = function(path) {
  * Search empty files and add it to delete list
  * @returns {Q.Promise}
  */
-PackageCleaner.prototype.searchEmptyFiles = function() {
-    var that = this;
+PackageCleaner.prototype.deleteEmptyFiles = function() {
+    return this.searchEmptyFiles()
+        .then(function(files) {
+            files.map(this.addPathToDeleteList);
+        }.bind(this));
+};
 
-    var promises = this.filesToKeep.map(function(p) {
+/**
+ * Search empty files
+ * @param {String[]} [files] - если не будет передан для фильтрации будет использоваться this.filesToKeep
+ * @returns {Q.Promise<String[]>}
+ */
+PackageCleaner.prototype.searchEmptyFiles = function(files) {
+    var that = this;
+    files = files || this.filesToKeep;
+
+    var promises = files.map(function(p) {
         return that._statMethod(p)
             .then(function(stat) { return { path: p, size: stat.size } })
     });
 
     return Q.all(promises).then(function(files) {
-        _.chain(files)
+        return _.chain(files)
             .reject('size')
             .pluck('path')
-            .map(that.addPathToDeleteList);
+            .value();
     });
 };
 
@@ -224,7 +252,18 @@ PackageCleaner.prototype.setDryRunMethods = function() {
     return this;
 };
 
-PackageCleaner.prototype._statMethod = function(p) { return FSQ.stat(p) };
+PackageCleaner.prototype._statMethod = function(p) {
+    return FSQ.stat(p)
+        .catch(function(e) {
+            // if symlink target not exist, skip this error
+            if (e.code === 'ENOENT') {
+                console.warn('Warning file "%s" not exist', e.path);
+                return { path: '', size: 0 };
+            }
+
+            throw new Error(e);
+        });
+};
 
 PackageCleaner.prototype._deleteFileMethod = function(p) { return FSQ.remove(p) };
 

@@ -91,8 +91,11 @@ Options:
   -p PATTERNS, --patterns=PATTERNS : Path to file with patterns (required)
   -w WORKINGDIR, --working-dir=WORKINGDIR : Working directory
   -d, --dry-run : Dry run
+  
+Options for clean subcommand:
   --delete-empty : Delete empty files
 
 Options for copy subcommand:
   -o OUTPUTDIR, --output-dir=OUTPUTDIR : Output dir
+  --not-copy-empty : Not copy empty files
 ```
