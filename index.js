@@ -246,7 +246,7 @@ PackageCleaner.prototype.deleteFiles = function() {
 
 PackageCleaner.prototype.setDryRunMethods = function() {
     this._deleteDirMethod = function(p) { console.log('rm -rf ' + p)};
-    this._deleteFileMethod = function(p) { console.log('rm ' + p)};
+    this._deleteFileMethod = function(p) { console.log('rm -f ' + p)};
     this._copyMethod = function(f, t) { console.log('cp ' + f + ' ' + t)};
     this._makeTreeMethod = function(p) { console.log('mkdir -p ' + p)};
     return this;
