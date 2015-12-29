@@ -148,8 +148,11 @@ PackageCleaner.prototype.copyFiles = function(outPath, filesToCopy) {
 
     return Q.all(createDirsPromises)
         .then(function() {
-            var copyFilesPromises = filesToCopy.map(function(p) { return that._copyMethod(p, newPath(p)) });
-            return Q.all(copyFilesPromises);
+            return filesToCopy.reduce(function(prev, p) {
+                return prev.then(function() {
+                    return that._copyMethod(p, newPath(p));
+                });
+            }, Q());
         });
 };
 
