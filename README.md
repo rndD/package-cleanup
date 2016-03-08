@@ -45,7 +45,7 @@ src
 │       ├── __init__.pyc
 │       ├── run.py
 │       ├── run.rb
-│       ├── sercret.txt
+│       ├── secret.txt
 │       ├── test.py
 │       └── test.rb
 └── b_dir
