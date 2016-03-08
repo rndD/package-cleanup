@@ -39,7 +39,7 @@ var PackageCleaner = function (patternsFilename, globbyOptions, options) {
 };
 
 /**
- * Входная точка для команды clean из cli
+ * Entrance point for `clean` command from CLI
  */
 PackageCleaner.prototype.clean = function() {
     return Q.when(this.readPatterns())
@@ -54,7 +54,7 @@ PackageCleaner.prototype.clean = function() {
 };
 
 /**
- * Входная точка для команды copy из cli
+ * Entrance point for `copy` command from CLI
  */
 PackageCleaner.prototype.copy = function(outPath) {
     return Q.when(this._makeTreeMethod(outPath))
