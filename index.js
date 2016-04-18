@@ -68,7 +68,15 @@ PackageCleaner.prototype.copy = function(outPath) {
 };
 
 PackageCleaner.prototype.readPatterns = function() {
-    return FSQ.read(this.patternsFilename);
+    var patternsFilename = this.patternsFilename;
+
+    if (path.extname(patternsFilename) === 'js') {
+        var dynamicPatterns = require(patternsFilename);
+
+        return Q.fcall(dynamicPatterns);
+    }
+
+    return FSQ.read(patternsFilename);
 };
 
 /**
