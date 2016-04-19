@@ -86,7 +86,7 @@ PackageCleaner.prototype.parsePatterns = function(content) {
 
 /**
  * @param {String[]} patterns
- * @returns {Q.Promise}
+ * @returns {Promise}
  */
 PackageCleaner.prototype.getFilesToKeep = function(patterns) {
     return globby(patterns, this.globbyOptions);
@@ -96,7 +96,7 @@ PackageCleaner.prototype.getFilesToKeep = function(patterns) {
  * @param {String[]} filesToKeep
  */
 PackageCleaner.prototype.setFilesToKeep = function(filesToKeep) {
-    this.filesToKeep = _.map(filesToKeep, path.normalize);
+    this.filesToKeep = filesToKeep.map(path.normalize);
     this.dirsToKeep = this.getDirsToKeep(this.filesToKeep);
 };
 
@@ -106,7 +106,13 @@ PackageCleaner.prototype.setFilesToKeep = function(filesToKeep) {
  */
 PackageCleaner.prototype.getDirsToKeep = function(filesToKeep) {
 
-    function parsePathToDirs(dirsToKeep, dirPath) {
+    /**
+     * Split "/a/b/c/d" to ["/a", "/a/b", "/a/b/c", "/a/b/c/d"]
+     * @param {String[]} dirsToKeep
+     * @param {String} dirPath
+     * @returns {*}
+     */
+    function getDirsFromPath(dirsToKeep, dirPath) {
         var dirs = dirPath.split(path.sep);
         _.reduce(dirs, function(p, d) {
             var newDir = p ? path.join(p, d): d;
@@ -117,10 +123,10 @@ PackageCleaner.prototype.getDirsToKeep = function(filesToKeep) {
         return dirsToKeep;
     }
 
-    return _.chain(filesToKeep)
+    return _(filesToKeep)
         .map(path.dirname)
         .map(path.normalize)
-        .reduce(parsePathToDirs, [])
+        .reduce(getDirsFromPath, [])
         .uniq()
         .sort()
         .value();
@@ -129,7 +135,7 @@ PackageCleaner.prototype.getDirsToKeep = function(filesToKeep) {
 /**
  * @param {String} outPath - output dir path
  * @param {String[]} filesToCopy
- * @returns {Q.Promise}
+ * @returns {Promise}
  */
 PackageCleaner.prototype.copyFiles = function(outPath, filesToCopy) {
     var that = this;
@@ -155,7 +161,7 @@ PackageCleaner.prototype.copyFiles = function(outPath, filesToCopy) {
 
 /**
  * @param {String[]} filesToFilter
- * @returns {Q.Promise<String[]>}
+ * @returns {Promise<String[]>}
  */
 PackageCleaner.prototype.filterEmptyFiles = function(filesToFilter) {
     return this.searchEmptyFiles(filesToFilter)
@@ -165,7 +171,7 @@ PackageCleaner.prototype.filterEmptyFiles = function(filesToFilter) {
 };
 
 /**
- * @returns {Q.Promise}
+ * @returns {Promise}
  */
 PackageCleaner.prototype.searchFilesToDelete = function() {
     return FSQ.listTree('', this._guard);
@@ -202,7 +208,7 @@ PackageCleaner.prototype.addPathToDeleteList = function(path) {
 
 /**
  * Search empty files and add it to delete list
- * @returns {Q.Promise}
+ * @returns {Promise}
  */
 PackageCleaner.prototype.deleteEmptyFiles = function() {
     return this.searchEmptyFiles()
@@ -214,7 +220,7 @@ PackageCleaner.prototype.deleteEmptyFiles = function() {
 /**
  * Search empty files
  * @param {String[]} [files] - если не будет передан для фильтрации будет использоваться this.filesToKeep
- * @returns {Q.Promise<String[]>}
+ * @returns {Promise<String[]>}
  */
 PackageCleaner.prototype.searchEmptyFiles = function(files) {
     var that = this;
