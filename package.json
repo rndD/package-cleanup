@@ -1,6 +1,6 @@
 {
   "name": "package-cleanup",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Package cleanup before deploy - delete or copy all unnecessary files by gitignore-like patterns",
   "bin": {
     "package-cleanup": "./bin/package-cleanup"
