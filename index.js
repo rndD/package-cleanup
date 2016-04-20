@@ -70,8 +70,9 @@ PackageCleaner.prototype.copy = function(outPath) {
 PackageCleaner.prototype.readPatterns = function() {
     var patternsFilename = this.patternsFilename;
 
-    if (path.extname(patternsFilename) === 'js') {
-        var dynamicPatterns = require(patternsFilename);
+    if (path.extname(patternsFilename) === '.js') {
+        var patternsFilePath = path.resolve(process.cwd(), patternsFilename);
+        var dynamicPatterns = require(patternsFilePath);
 
         return Q.fcall(dynamicPatterns);
     }
