@@ -10,7 +10,7 @@
     "watch": "mocha --watch"
   },
   "engines": {
-    "node": ">=0.10.0"
+    "node": ">=4"
   },
   "author": {
     "name": "Alexey Kalmakov",
