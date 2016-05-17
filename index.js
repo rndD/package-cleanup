@@ -58,6 +58,10 @@ PackageCleaner.prototype.clean = function() {
  * Entrance point for `copy` command from CLI
  */
 PackageCleaner.prototype.copy = function(outPath) {
+    if (this.options['dryRun'] === true) {
+        throw new Error('Dry-run not work with copy command in this version');
+    }
+
     return this.readPatterns()
         .then(this.parsePatterns)
         .then((patterns) => {
@@ -65,6 +69,7 @@ PackageCleaner.prototype.copy = function(outPath) {
 
             return tartifacts({
                 dest: outPath,
+                root: this.options['workingDir'] || '.',
                 patterns: patterns,
                 tar: basename.includes('.tar'),
                 gzip: basename.includes('.gz')
@@ -140,17 +145,6 @@ PackageCleaner.prototype.getDirsToKeep = function(filesToKeep) {
         .uniq()
         .sort()
         .value();
-};
-
-/**
- * @param {String[]} filesToFilter
- * @returns {Q.Promise<String[]>}
- */
-PackageCleaner.prototype.filterEmptyFiles = function(filesToFilter) {
-    return this.searchEmptyFiles(filesToFilter)
-        .then(function(emptyFiles) {
-            return _.difference(filesToFilter, emptyFiles);
-        })
 };
 
 /**
@@ -236,8 +230,6 @@ PackageCleaner.prototype.deleteFiles = function() {
 PackageCleaner.prototype.setDryRunMethods = function() {
     this._deleteDirMethod = function(p) { console.log('rm -rf ' + p)};
     this._deleteFileMethod = function(p) { console.log('rm ' + p)};
-    this._copyMethod = function(f, t) { console.log('cp ' + f + ' ' + t)};
-    this._makeTreeMethod = function(p) { console.log('mkdir -p ' + p)};
     return this;
 };
 
@@ -257,10 +249,6 @@ PackageCleaner.prototype._statMethod = function(p) {
 PackageCleaner.prototype._deleteFileMethod = function(p) { return FSQ.remove(p) };
 
 PackageCleaner.prototype._deleteDirMethod = function(p) { return FSQ.removeTree(p) };
-
-PackageCleaner.prototype._copyMethod = function(f, t) { return FSQ.copyTree(f,t) };
-
-PackageCleaner.prototype._makeTreeMethod = function(p) { return FSQ.makeTree(p) };
 
 PackageCleaner.prototype._isItFileToKeep = function(file) {
     return _.contains(this.filesToKeep, file);

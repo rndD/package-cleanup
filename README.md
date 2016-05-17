@@ -2,7 +2,8 @@
 
 [![Build Status](https://travis-ci.org/rndD/package-cleanup.svg?branch=master)](https://travis-ci.org/rndD/package-cleanup)
 
-Command-line tool to delete or copy all unnecessary files by gitignore-like patterns.
+Command-line tool to delete all unnecessary files or copy necessary by gitignore-like patterns. 
+If you need only to copy files use [tartifacts](https://github.com/blond/tartifacts) instead.
 
 #### Example
 
@@ -22,6 +23,10 @@ all.css
 img/img1.png
 img/img2.svg
 
+# or even archive all frontend files in tarball
+$ ./node_modules/.bin/package-cleanup copy -p .frontend-patterns -o ./frontend-package.tar.gz
+$ ls .
+frontend-package.tar.gz
 ```
 
 Delete all not python/ruby files in 'src':
@@ -90,12 +95,12 @@ Options:
   -v, --version : Version
   -p PATTERNS, --patterns=PATTERNS : Path to file with patterns (required)
   -w WORKINGDIR, --working-dir=WORKINGDIR : Working directory
-  -d, --dry-run : Dry run
   
 Options for clean subcommand:
   --delete-empty : Delete empty files
+  -d, --dry-run : Dry run
 
 Options for copy subcommand:
-  -o OUTPUTDIR, --output-dir=OUTPUTDIR : Output dir
+  -o OUTPUTDIR, --output-dir=OUTPUTDIR : Output dir, it can be dir or archive name(.tar or .tar.gz).
   --not-copy-empty : Not copy empty files
 ```
