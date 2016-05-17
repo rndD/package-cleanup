@@ -5,6 +5,7 @@ var _ = require('lodash');
 
 var Q = require('q');
 var FSQ = require("q-io/fs");
+var tartifacts = require('tartifacts');
 
 var globby = require('./lib/globby-as-promise');
 
@@ -57,12 +58,18 @@ PackageCleaner.prototype.clean = function() {
  * Entrance point for `copy` command from CLI
  */
 PackageCleaner.prototype.copy = function(outPath) {
-    return Q.when(this._makeTreeMethod(outPath))
-        .then(this.readPatterns)
+    return this.readPatterns()
         .then(this.parsePatterns)
-        .then(this.getFilesToKeep)
-        .then(this.options['notCopyEmpty'] ? this.filterEmptyFiles: _.identity)
-        .then(_.partial(this.copyFiles, outPath))
+        .then((patterns) => {
+            var basename = path.basename(outPath);
+
+            return tartifacts({
+                dest: outPath,
+                patterns: patterns,
+                tar: basename.includes('.tar'),
+                gzip: basename.includes('.gz')
+            }, { emptyFiles: !this.options['notCopyEmpty'] });
+        })
         .catch(logStackTraceAndExit)
         .done();
 };
@@ -133,36 +140,6 @@ PackageCleaner.prototype.getDirsToKeep = function(filesToKeep) {
         .uniq()
         .sort()
         .value();
-};
-
-/**
- * @param {String} outPath - output dir path
- * @param {String[]} filesToCopy
- * @returns {Q.Promise}
- */
-PackageCleaner.prototype.copyFiles = function(outPath, filesToCopy) {
-    var that = this;
-
-    function newPath(p) {
-        return path.join(outPath, p);
-    }
-
-    var createDirsPromises = _.chain(filesToCopy)
-        .map(path.dirname)
-        .map(path.normalize)
-        .uniq()
-        .map(newPath)
-        .map(this._makeTreeMethod)
-        .value();
-
-    return Q.all(createDirsPromises)
-        .then(function() {
-            return filesToCopy.reduce(function(prev, p) {
-                return prev.then(function() {
-                    return that._copyMethod(p, newPath(p));
-                });
-            }, Q());
-        });
 };
 
 /**

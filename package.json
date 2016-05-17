@@ -10,7 +10,7 @@
     "watch": "mocha --watch"
   },
   "engines": {
-    "node": ">=0.10.0"
+    "node": ">=4"
   },
   "author": {
     "name": "Alexey Kalmakov",
@@ -24,11 +24,12 @@
   "homepage": "https://github.com/rndD/package-cleanup",
   "bugs": "https://github.com/rndD/package-cleanup/issues",
   "dependencies": {
-    "globby": "^1.1.0",
     "coa": "^0.4.1",
+    "globby": "^1.1.0",
     "lodash": "^3.3.1",
     "q": "^1.1.2",
-    "q-io": "^1.11.6"
+    "q-io": "^1.11.6",
+    "tartifacts": "^1.0.0"
   },
   "devDependencies": {
     "chai": "^1.9.1",
