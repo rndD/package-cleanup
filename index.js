@@ -61,9 +61,13 @@ PackageCleaner.prototype.copy = function(outPath) {
     return this.readPatterns()
         .then(this.parsePatterns)
         .then((patterns) => {
+            var basename = path.basename(outPath);
+
             return tartifacts({
                 dest: outPath,
-                patterns: patterns
+                patterns: patterns,
+                tar: basename.includes('.tar'),
+                gzip: basename.includes('.gz')
             }, { emptyFiles: !this.options['notCopyEmpty'] });
         })
         .catch(logStackTraceAndExit)
