@@ -1,9 +1,37 @@
 ### Package cleanup
+**Status:** Archive (code is provided as-is, no updates expected)
 
 [![Build Status](https://travis-ci.org/rndD/package-cleanup.svg?branch=master)](https://travis-ci.org/rndD/package-cleanup)
 
-Command-line tool to delete all unnecessary files or copy necessary by gitignore-like patterns. 
-If you need only to copy files use [tartifacts](https://github.com/blond/tartifacts) instead.
+Command-line tool used to delete or copy files by gitignore-like patterns. 
+If you need only to copy files use [tartifacts](https://github.com/blond/tartifacts) instead, it's faster.
+
+#### Usage
+
+```
+Package cleanup
+
+Usage:
+  package-cleanup COMMAND [OPTIONS] [ARGS]
+
+Commands:
+  clean : Cleanup package - delete all files matching to the patters
+  copy : Copy all files matching to the patterns to dir
+
+Options:
+  -h, --help : Help
+  -v, --version : Version
+  -p PATTERNS, --patterns=PATTERNS : Path to file with patterns (required)
+  -w WORKINGDIR, --working-dir=WORKINGDIR : Working directory
+  
+Options for clean subcommand:
+  --delete-empty : Delete empty files
+  -d, --dry-run : Dry run
+
+Options for copy subcommand:
+  -o OUTPUTDIR, --output-dir=OUTPUTDIR : Output dir, it can be dir or archive name(.tar or .tar.gz).
+  --not-copy-empty : Not copy empty files
+```
 
 #### Example
 
@@ -76,31 +104,4 @@ src
         └── data.py
 
 4 directories, 6 files
-```
-
-#### Usage
-
-```
-Package cleanup
-
-Usage:
-  package-cleanup COMMAND [OPTIONS] [ARGS]
-
-Commands:
-  clean : Cleanup package - delete all files matching to the patters
-  copy : Copy all files matching to the patterns to dir
-
-Options:
-  -h, --help : Help
-  -v, --version : Version
-  -p PATTERNS, --patterns=PATTERNS : Path to file with patterns (required)
-  -w WORKINGDIR, --working-dir=WORKINGDIR : Working directory
-  
-Options for clean subcommand:
-  --delete-empty : Delete empty files
-  -d, --dry-run : Dry run
-
-Options for copy subcommand:
-  -o OUTPUTDIR, --output-dir=OUTPUTDIR : Output dir, it can be dir or archive name(.tar or .tar.gz).
-  --not-copy-empty : Not copy empty files
 ```
