@@ -27,7 +27,7 @@
   "dependencies": {
     "coa": "^0.4.1",
     "globby": "^1.1.0",
-    "lodash": "^3.3.1",
+    "lodash": "^4.17.15",
     "q": "^1.1.2",
     "q-io": "^1.11.6",
     "tartifacts": "^1.0.0"
